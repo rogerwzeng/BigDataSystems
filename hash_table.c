@@ -13,6 +13,8 @@ bool isPrime(int n) {
     if (n <= 1) return false;
     if (n <= 3) return true;
     if (n % 2 == 0 || n % 3 == 0) return false;
+
+    //all primes > 3 satisfies n = 6k ± 1, also the "square root trick"
     for (int i = 5; i * i <= n; i += 6) {
         if (n % i == 0 || n % (i + 2) == 0) return false;
     }
@@ -107,7 +109,7 @@ hashtable* rehash(hashtable* oldHt, int newSize) {
     }
 
     // Deallocate the old hash table
-    deallocate(oldHt);
+    //deallocate(oldHt);
 
     return newHt;
 }
@@ -128,14 +130,35 @@ int put(hashtable* ht, keyType key, valType value) {
             errno = ENOMEM;  // Out of memory
             return -1;
         }
-        //Update ht to point to the new table
-        //deallocate(ht);
-        *ht = *newHt;
+        // Save old table
+        hashtable oldTable = *ht;
+
+        // Update ht with the new table's contents
+        ht->size = newHt->size;
+        ht->count = newHt->count;
+        ht->table = newHt->table;
+
+        //*ht = *newHt;
         free(newHt); //free up the pointer
+
+        //deallocate the old table's contents
+        for (int i = 0; i < oldTable.size; i++) {
+            node* current = oldTable.table[i];
+            while (current != NULL) {
+                node* next = current->next;
+                free(current);
+                current = next;
+            }
+        }
+        free(oldTable.table);
     }
 
+    // insert the new node
     int index = hashFunction(key, ht->size);
     node* newNode = createNode(key, value);
+    if (newNode == NULL) {
+        return -1;  //New node creation failed
+    }
 
     if (ht->table[index] == NULL) { //no existing node at this index
         ht->table[index] = newNode;
