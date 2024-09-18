@@ -1,17 +1,34 @@
-#ifndef CS165_HASH_TABLE // This is a header guard. It prevents the header from being included more than once.
-#define CS165_HASH_TABLE  
+// Function declarations
+#ifndef HASH_TABLE_H
+#define HASH_TABLE_H
 
-typedef struct hashtable {
-// define the components of the hash table here (e.g. the array, bookkeeping for number of elements, etc)
-} hashtable;
+#include <stdbool.h>
 
 typedef int keyType;
 typedef int valType;
 
+typedef struct node {
+    keyType key;
+    valType value;
+    struct node* next;
+} node;
+
+typedef struct hashtable {
+    int size;
+    int count;
+    node** table;
+} hashtable;
+
+// Function declarations
+bool isPrime(int n);
+int nextPrime(int n);
+unsigned int hashFunction(keyType key, int size);
 int allocate(hashtable** ht, int size);
+node* createNode(keyType key, valType value);
+hashtable* rehash(hashtable* oldHt, int newSize);
 int put(hashtable* ht, keyType key, valType value);
 int get(hashtable* ht, keyType key, valType *values, int num_values, int* num_results);
 int erase(hashtable* ht, keyType key);
 int deallocate(hashtable* ht);
 
-#endif
+#endif // HASH_TABLE_H

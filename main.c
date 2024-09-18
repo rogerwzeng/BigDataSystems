@@ -1,40 +1,52 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "hash_table.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-// This is where you can implement your own tests for the hash table
-// implementation. 
-int main(void) {
+#define MAX_RESULTS 5  //limit the # of returned nodes
 
-  hashtable *ht = NULL;
-  int size = 10;
-  allocate(&ht, size);
+int main() {
+    hashtable* ht = NULL;
+    int result = allocate(&ht, MAX_RESULTS);  // Start with a small size then rehash
 
-  int key = 0;
-  int value = -1;
+    if (result == 0)
+        printf("Hash Table Allocation Successful\n");
+    else {
+        printf("FAILED to Create Hash Table\n");
+        return -1;
+    }
 
-  put(ht, key, value);
+    valType values[MAX_RESULTS] = {0};
+    int num_values = MAX_RESULTS;
+    int num_results;
 
-  int num_values = 1;
+    for (int i = 0; i < 20; i++) {
+        put(ht, i, i * 10);
+        printf("Inserted %d, Size: %d, Count: %d\n", i, ht->size, ht->count);
+    }
 
-  valType* values = malloc(1 * sizeof(valType));
+    for (int i = 0; i < 20; i++) {
+        int result = get(ht, i, values, num_values, &num_results);
+        if (result == 0) {
+            printf("Number of results for key %d: %d\n", i, num_results);
+            for (int i = 0; i < num_results && i < num_values; i++) {
+                printf("Value %d: %d\n", i + 1, values[i]);
+            }
+            if (num_results > num_values) {
+                printf("Not all results could be stored in the buffer.\n");
+            }
+        } else {
+            printf("Error retrieving values for key %d\n", i);
+        }
+    }
 
-  int* num_results = NULL;
+    // Try to get a non-existent key
+    result = get(ht, 100, values, num_values, &num_results);
+    if (result == 0) {
+        printf("Number of results for key 100: %d\n", num_results);
+    } else {
+        printf("Error retrieving values for key 100\n");
+    }
 
-  get(ht, key, values, num_values, num_results);
-  if ((*num_results) > num_values) {
-    values = realloc(values, (*num_results) * sizeof(valType));
-    get(ht, 0, values, num_values, num_results);
-  }
-
-  for (int i = 0; i < (*num_results); i++) {
-    printf("value of %d is %d \n", i, values[i]);
-  }
-  free(values);
-
-  erase(ht, 0);
-
-  deallocate(ht);
-  return 0;
+    deallocate(ht);
+    return 0;
 }
