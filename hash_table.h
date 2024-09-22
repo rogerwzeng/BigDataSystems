@@ -22,7 +22,6 @@ typedef struct hashtable {
 // Function declarations
 bool isPrime(int n);
 int nextPrime(int n);
-unsigned int hashFunction(keyType key, int size);
 int allocate(hashtable** ht, int size);
 node* createNode(keyType key, valType value);
 hashtable* rehash(hashtable* oldHt, int newSize);

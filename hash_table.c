@@ -34,18 +34,9 @@ int nextPrime(int n) {
 }
 
 // Hash function (modular hashing)
-unsigned int hashFunction(keyType key, int size) {
+static inline unsigned int hashFunction(keyType key, int size) {
     // the default modulus function
-    // return key % size;
-
-    // A better hash function
-    unsigned int hash = (unsigned int)key;
-
-    //Uses bit manipulation and multiplication to spread the influence of all bits of the key.
-    hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
-    hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
-    hash = (hash >> 16) ^ hash;
-    return hash % size;
+    return key % size;
 }
 
 // Allocate a new hash table
@@ -138,7 +129,6 @@ int put(hashtable* ht, keyType key, valType value) {
         ht->count = newHt->count;
         ht->table = newHt->table;
 
-        //*ht = *newHt;
         free(newHt); //free up the pointer
 
         //deallocate the old table's contents
@@ -183,6 +173,7 @@ int put(hashtable* ht, keyType key, valType value) {
         temp->next = newNode;
     }
     ht->count++;
+
     return 0;
 }
 

@@ -2,31 +2,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-
 #include "hash_table.h"
 
-// This code is designed to stress test your hash table implementation. You do
-// not need to significantly change it, but you may want to vary the value of
-// num_tests to control the amount of time and memory that benchmarking takes
-// up. Compile and run it in the command line by typing:
-// make benchmark; ./benchmark
-
-
+#define START_SIZE 30000000
+#define NUM_TESTS 50000000
 
 int main(void) {
 
   hashtable* ht=NULL;
-  int num_tests = 50000000;
-  assert(allocate(&ht, num_tests)==0);
+  //assert(allocate(&ht, num_tests)==0);
+  assert(allocate(&ht, START_SIZE)==0); //start small and dynamically grow
 
   int seed = 2;
   srand(seed);
-  printf("Performing stress test. Inserting 50 million keys.\n");
+  printf("Performing stress test with starting hash table size of %d\n", START_SIZE);
+  printf("Inserting %d keys...\n", NUM_TESTS);
 
   struct timeval stop, start;
   gettimeofday(&start, NULL);
 
-  for (int i = 0; i < num_tests; i += 1) {
+  for (int i = 0; i < NUM_TESTS; i += 1) {
     int key = rand();
     int val = rand();
     assert(put(ht, key, val)==0);
@@ -34,7 +29,8 @@ int main(void) {
 
   gettimeofday(&stop, NULL);
   double secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec); 
-  printf("50 million insertions took %f seconds\n", secs);
+  printf("%d insertions took %f seconds\n", NUM_TESTS, secs);
+  printf("Hash table size = %d & count = %d\n", ht->size, ht->count);
 
   assert(deallocate(ht)==0);
 
